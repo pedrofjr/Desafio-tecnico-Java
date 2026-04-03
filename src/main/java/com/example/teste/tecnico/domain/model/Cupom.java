@@ -41,7 +41,7 @@ public class Cupom {
     private Status status;
     private boolean deleted;
 
-    public Cupom(String code, String description, double discountValue,
+    private Cupom(String code, String description, double discountValue,
                   String expirationDate, boolean published, Status status) {
         this.code = code;
         this.description = description;
