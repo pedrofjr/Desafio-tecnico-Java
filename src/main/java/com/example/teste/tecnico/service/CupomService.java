@@ -4,8 +4,10 @@ import com.example.teste.tecnico.domain.model.Cupom;
 import com.example.teste.tecnico.domain.model.Status;
 import com.example.teste.tecnico.dto.CupomRequestDTO;
 import com.example.teste.tecnico.dto.CupomResponseDTO;
+import com.example.teste.tecnico.exception.NotFoundException;
 import com.example.teste.tecnico.repository.CupomRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -52,6 +54,14 @@ public class CupomService {
             cupom.isRedeemed()
         );
         return cupomResponseDTO;
+    }
+
+    @Transactional
+    public void deleteCupomById(String id) {
+        Cupom cupom = cupomRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Coupon not found with id: " + id));
+        cupom.delete();
+        cupomRepository.save(cupom);
     }
 
     public Cupom getCupomByCode(String code) {
