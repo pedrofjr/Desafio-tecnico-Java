@@ -194,4 +194,30 @@ class CupomIntegrationTest {
         mockMvc.perform(post("/coupon").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().is4xxClientError());
     }
+
+    @Test
+    @DisplayName("POST /coupon sem campo published deve defaultar published=false")
+    void postCoupon_semPublished_deveDefaultarParaFalse() throws Exception {
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("code", "ABC123");
+        payload.put("description", "Sem campo published");
+        payload.put("discountValue", 1.0);
+        payload.put("expirationDate", DATA_FUTURA.toString());
+        mockMvc.perform(post("/coupon").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.published").value(false));
+    }
+
+    @Test
+    @DisplayName("POST /coupon com code longo deve truncar para 6 chars")
+    void postCoupon_codeLongo_deveTruncarPara6Chars() throws Exception {
+        Map<String, Object> payload = Map.of(
+                "code", "ABCDEFGHIJ", "description", "Truncamento",
+                "discountValue", 1.0, "expirationDate", DATA_FUTURA.toString(), "published", false);
+        mockMvc.perform(post("/coupon").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").value("ABCDEF"));
+    }
 }

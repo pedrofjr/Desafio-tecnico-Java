@@ -16,5 +16,5 @@ public record CupomRequestDTO(
     @NotBlank(message = "expirationDate is required")
     String expirationDate,
 
-    boolean published
+    Boolean published
 ) {}

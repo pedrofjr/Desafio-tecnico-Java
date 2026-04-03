@@ -24,7 +24,7 @@ public class CupomService {
                 dto.description(),
                 dto.discountValue(),
                 dto.expirationDate(),
-                dto.published()
+                Boolean.TRUE.equals(dto.published())
         );
         cupomRepository.save(cupom);
         return toResponseDTO(cupom);

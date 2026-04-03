@@ -83,6 +83,10 @@ public class Cupom {
     }
 
     private static String sanitizeCode(String code) {
-        return code.replaceAll("[^a-zA-Z0-9]", "");
+        String sanitized = code.replaceAll("[^a-zA-Z0-9]", "");
+        if (sanitized.isEmpty()) {
+            throw new BusinessException("Code must contain at least one alphanumeric character");
+        }
+        return sanitized.substring(0, Math.min(6, sanitized.length()));
     }
 }

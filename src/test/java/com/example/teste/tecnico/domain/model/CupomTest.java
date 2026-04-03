@@ -46,6 +46,21 @@ class CupomTest {
     }
 
     @Test
+    @DisplayName("[3b] code com mais de 6 alfanumericos deve ser truncado para os primeiros 6")
+    void create_codeLongoAposSanitizacao_deveTruncarPara6() {
+        Cupom cupom = Cupom.create("ABCDEFGHIJ", "desc", 1.0, DATA_FUTURA, false);
+        assertEquals("ABCDEF", cupom.getCode());
+        assertEquals(6, cupom.getCode().length());
+    }
+
+    @Test
+    @DisplayName("[3c] code apenas com especiais deve lancar BusinessException")
+    void create_codeApenasEspeciais_deveLancarBusinessException() {
+        assertThrows(BusinessException.class,
+                () -> Cupom.create("!@#$%^", "desc", 1.0, DATA_FUTURA, false));
+    }
+
+    @Test
     @DisplayName("[4] discountValue = 0.5 deve ser aceito")
     void create_descontoMinimo_deveAceitar() {
         assertDoesNotThrow(() -> Cupom.create("ABC123", "desc", 0.5, DATA_FUTURA, false));
