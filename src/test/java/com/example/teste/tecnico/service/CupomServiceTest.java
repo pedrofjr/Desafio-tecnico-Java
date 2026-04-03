@@ -106,11 +106,11 @@ class CupomServiceTest {
     }
 
     @Test
-    @DisplayName("[18] deleteCupomById valido deve chamar save() com deleted=true (soft-delete)")
+    @DisplayName("[18] deleteCupomById valido deve chamar save() com status=DELETED (soft-delete)")
     void deleteCupomById_cupomValido_deveChamarSaveComDeletedTrue() {
         when(cupomRepository.findById(ID_VALIDO)).thenReturn(Optional.of(cupomAtivo));
         when(cupomRepository.save(any(Cupom.class))).thenAnswer(inv -> inv.getArgument(0));
         cupomService.deleteCupomById(ID_VALIDO);
-        verify(cupomRepository, times(1)).save(argThat((Cupom c) -> c.isDeleted() && c.getStatus() == Status.INACTIVE));
+        verify(cupomRepository, times(1)).save(argThat((Cupom c) -> c.getStatus() == Status.DELETED));
     }
 }

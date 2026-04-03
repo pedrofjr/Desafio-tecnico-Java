@@ -153,7 +153,7 @@ class CupomIntegrationTest {
         Cupom cupom = cupomRepository.save(Cupom.create("DEL002", "Sera deletado", 1.0, DATA_FUTURA.toString(), false));
         cupom.delete();
         cupomRepository.save(cupom);
-        // Mesma transacao: L1 cache retorna entidade com deleted=true → BusinessException (422)
+        // Mesma transacao: L1 cache retorna entidade com status=DELETED → BusinessException (422)
         // Transacoes separadas: @SQLRestriction filtra o registro → NotFoundException (404)
         // Ambos os casos sao 4xx corretos.
         mockMvc.perform(delete("/coupon/{id}", cupom.getId()))

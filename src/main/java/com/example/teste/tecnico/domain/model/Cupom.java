@@ -22,7 +22,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "cupom")
-@SQLRestriction("deleted = false")
+@SQLRestriction("status <> 'DELETED'")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -39,7 +39,6 @@ public class Cupom {
     private boolean redeemed;
     @Enumerated(EnumType.STRING)
     private Status status;
-    private boolean deleted;
 
     private Cupom(String code, String description, double discountValue,
                   String expirationDate, boolean published, Status status) {
@@ -50,7 +49,6 @@ public class Cupom {
         this.published = published;
         this.redeemed = false;
         this.status = Status.ACTIVE;
-        this.deleted = false;
     }
 
     public static Cupom create(String code, String description,
@@ -64,11 +62,10 @@ public class Cupom {
     }
 
     public void delete() {
-        if (this.deleted) {
+        if (this.status == Status.DELETED) {
             throw new BusinessException("Coupon already deleted");
         }
-        this.deleted = true;
-        this.status = Status.INACTIVE;
+        this.status = Status.DELETED;
     }
 
     private static void validateExpirationDate(String expirationDate) {

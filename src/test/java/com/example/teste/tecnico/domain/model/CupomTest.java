@@ -26,7 +26,7 @@ class CupomTest {
 
         assertFalse(cupom.isPublished());
         assertFalse(cupom.isRedeemed());
-        assertFalse(cupom.isDeleted());
+        assertFalse(cupom.getStatus() == Status.DELETED);
         assertEquals(Status.ACTIVE, cupom.getStatus());
     }
 
@@ -92,12 +92,12 @@ class CupomTest {
     }
 
     @Test
-    @DisplayName("[11] delete() em cupom ativo deve setar deleted=true")
+    @DisplayName("[11] delete() em cupom ativo deve setar status=DELETED")
     void delete_cupomAtivo_deveSetarDeletedTrue() {
         Cupom cupom = Cupom.create("ABC123", "desc", 1.0, DATA_FUTURA, false);
-        assertFalse(cupom.isDeleted());
+        assertFalse(cupom.getStatus() == Status.DELETED);
         cupom.delete();
-        assertTrue(cupom.isDeleted());
+        assertTrue(cupom.getStatus() == Status.DELETED);
     }
 
     @Test
@@ -107,13 +107,5 @@ class CupomTest {
         cupom.delete();
         BusinessException ex = assertThrows(BusinessException.class, cupom::delete);
         assertTrue(ex.getMessage().toLowerCase().contains("already deleted"));
-    }
-
-    @Test
-    @DisplayName("[13] apos delete(), status deve ser INACTIVE")
-    void delete_aposDelecao_statusDeveSerInactive() {
-        Cupom cupom = Cupom.create("ABC123", "desc", 1.0, DATA_FUTURA, false);
-        cupom.delete();
-        assertEquals(Status.INACTIVE, cupom.getStatus());
     }
 }
