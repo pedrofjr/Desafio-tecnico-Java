@@ -82,10 +82,10 @@ Acesse `http://localhost:8080/swagger-ui.html` com a aplicação em execução.
 
 | Campo            | Tipo      | Obrigatório | Regras                                         |
 |------------------|-----------|-------------|------------------------------------------------|
-| `code`           | `string`  | Sim           | Alfanumérico; especiais removidos; máx. 6 chars |
+| `code`           | `string`  | Sim           | Alfanumérico; especiais removidos; exatamente 6 chars |
 | `description`    | `string`  | Sim           | —                                              |
 | `discountValue`  | `number`  | Sim           | Mínimo `0.5`                                   |
-| `expirationDate` | `string`  | Sim           | ISO 8601 (`yyyy-MM-dd`); deve ser futura       |
+| `expirationDate` | `string`  | Sim           | ISO 8601 (datetime); deve ser futura           |
 | `published`      | `boolean` | Não           | Default `false`                                |
 
 **Response `201 Created`**:
@@ -153,8 +153,8 @@ A suíte inclui:
 - **`published` como `Boolean` wrapper, não `boolean` primitivo.**  
   Com `boolean`, um campo ausente no JSON é deserializado como `false`, o que coincide com o default esperado, mas esconde a intenção do cliente. Com `Boolean`, o campo ausente chega como `null`, e o Service aplica o default explicitamente via `Boolean.TRUE.equals(dto.published())`. Isso permite distinguir "o cliente enviou `false`" de "o cliente omitiu o campo".
 
-- **Truncamento silencioso do `code` para 6 caracteres, com guard para código vazio.**  
-  Em vez de rejeitar códigos com mais de 6 caracteres alfanuméricos (o que quebraria clients que enviam códigos longos), optei por truncar para os primeiros 6. Ao mesmo tempo, adicionei uma validação defensiva: se após a remoção de caracteres especiais o código ficar vazio, uma `BusinessException` é lançada, cenário que a sanitização pura do enunciado não endereçava.
+- **Truncamento silencioso do `code` para 6 caracteres, com rejeição para códigos com menos de 6 alfanuméricos.**  
+  Em vez de rejeitar códigos com mais de 6 caracteres alfanuméricos (o que quebraria clients que enviam códigos longos), optei por truncar para os primeiros 6. Ao mesmo tempo, códigos cujo conteúdo alfanumérico resultante tem menos de 6 caracteres são rejeitados com `BusinessException`, garantindo que o código persistido tenha exatamente 6 caracteres conforme o requisito.
 
 - **HTTP 422 para violações de regra de negócio, 400 para input malformado.**  
   Optei por mapear `BusinessException` para 422 (Unprocessable Entity) em vez de 400 (Bad Request). A distinção semântica: 400 indica que o servidor não conseguiu interpretar a requisição (JSON inválido, campo ausente); 422 indica que o servidor entendeu a requisição, mas as regras de negócio a rejeitam. Respostas de validação do Bean Validation retornam 400 com mapa de `fieldErrors`; respostas de domínio retornam 422 com `message` textual.

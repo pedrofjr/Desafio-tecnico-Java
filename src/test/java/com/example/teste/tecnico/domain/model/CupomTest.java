@@ -61,6 +61,21 @@ class CupomTest {
     }
 
     @Test
+    @DisplayName("[3d] code com menos de 6 alfanumericos apos sanitizacao deve lancar BusinessException")
+    void create_codeMenosDe6Alfanumericos_deveLancarBusinessException() {
+        assertThrows(BusinessException.class,
+                () -> Cupom.create("AB-C", "desc", 1.0, DATA_FUTURA, false));
+    }
+
+    @Test
+    @DisplayName("[3e] expirationDate em formato ISO 8601 datetime deve ser aceita")
+    void create_dataFormatoISO8601DateTime_deveAceitar() {
+        Cupom cupom = Cupom.create("ABC123", "desc", 1.0,
+                LocalDate.now().plusYears(2) + "T17:14:45.180Z", false);
+        assertNotNull(cupom);
+    }
+
+    @Test
     @DisplayName("[4] discountValue = 0.5 deve ser aceito")
     void create_descontoMinimo_deveAceitar() {
         assertDoesNotThrow(() -> Cupom.create("ABC123", "desc", 0.5, DATA_FUTURA, false));

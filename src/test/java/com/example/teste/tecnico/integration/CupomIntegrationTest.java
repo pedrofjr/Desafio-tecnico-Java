@@ -220,4 +220,28 @@ class CupomIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value("ABCDEF"));
     }
+
+    @Test
+    @DisplayName("POST /coupon com code com menos de 6 alfanumericos deve retornar 422")
+    void postCoupon_codeMenosDe6Alfanumericos_deveRetornar422() throws Exception {
+        Map<String, Object> payload = Map.of(
+                "code", "AB-C", "description", "Curto demais",
+                "discountValue", 1.0, "expirationDate", DATA_FUTURA.toString(), "published", false);
+        mockMvc.perform(post("/coupon").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().is(422))
+                .andExpect(jsonPath("$.message").exists());
+    }
+
+    @Test
+    @DisplayName("POST /coupon com expirationDate em formato ISO 8601 datetime deve retornar 201")
+    void postCoupon_dataFormatoISO8601DateTime_deveRetornar201() throws Exception {
+        Map<String, Object> payload = Map.of(
+                "code", "ABC123", "description", "Datetime format",
+                "discountValue", 1.0, "expirationDate", DATA_FUTURA + "T17:14:45.180Z", "published", false);
+        mockMvc.perform(post("/coupon").contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.code").value("ABC123"));
+    }
 }

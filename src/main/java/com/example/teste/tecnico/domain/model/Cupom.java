@@ -16,7 +16,8 @@ import lombok.NoArgsConstructor;
 import com.example.teste.tecnico.exception.BusinessException;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 
 import org.hibernate.annotations.SQLRestriction;
 
@@ -69,8 +70,16 @@ public class Cupom {
     }
 
     private static void validateExpirationDate(String expirationDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate expiration = LocalDate.parse(expirationDate, formatter);
+        LocalDate expiration;
+        try {
+            expiration = LocalDate.parse(expirationDate);
+        } catch (DateTimeParseException e) {
+            try {
+                expiration = OffsetDateTime.parse(expirationDate).toLocalDate();
+            } catch (DateTimeParseException e2) {
+                throw new BusinessException("Invalid expiration date format. Use ISO 8601 format");
+            }
+        }
         if (!expiration.isAfter(LocalDate.now())) {
             throw new BusinessException("Expiration date must be in the future");
         }
@@ -84,9 +93,9 @@ public class Cupom {
 
     private static String sanitizeCode(String code) {
         String sanitized = code.replaceAll("[^a-zA-Z0-9]", "");
-        if (sanitized.isEmpty()) {
-            throw new BusinessException("Code must contain at least one alphanumeric character");
+        if (sanitized.length() < 6) {
+            throw new BusinessException("Code must have exactly 6 alphanumeric characters after sanitization");
         }
-        return sanitized.substring(0, Math.min(6, sanitized.length()));
+        return sanitized.substring(0, 6);
     }
 }
