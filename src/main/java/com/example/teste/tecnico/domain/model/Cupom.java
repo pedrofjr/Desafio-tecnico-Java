@@ -8,8 +8,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
@@ -24,9 +25,9 @@ import org.hibernate.annotations.SQLRestriction;
 @Entity
 @Table(name = "cupom")
 @SQLRestriction("status <> 'DELETED'")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Cupom {
 
     @Id
@@ -42,7 +43,7 @@ public class Cupom {
     private Status status;
 
     private Cupom(String code, String description, double discountValue,
-                  String expirationDate, boolean published, Status status) {
+                  String expirationDate, boolean published) {
         this.code = code;
         this.description = description;
         this.discountValue = discountValue;
@@ -59,7 +60,7 @@ public class Cupom {
         validateDiscountValue(discountValue);
         String sanitizedCode = sanitizeCode(code);
         return new Cupom(sanitizedCode, description, discountValue,
-                expirationDate, published, Status.ACTIVE);
+                expirationDate, published);
     }
 
     public void delete() {

@@ -167,3 +167,6 @@ A suíte inclui:
 
 - **JaCoCo integrado ao ciclo `test` do Maven, sem goal separado.**  
   Configurei o `jacoco-maven-plugin` com dois executions: `prepare-agent` (que instrumenta o bytecode antes dos testes) e `report` vinculado à fase `test`. Com isso, `./mvnw clean test` já gera o relatório HTML em `target/site/jacoco/` sem nenhum comando adicional. A alternativa seria vincular à fase `verify`, mas como o projeto não tem um pipeline de CI configurado, preferir a geração antecipada facilita a inspeção local imediata após cada rodada de testes.
+
+- **`@AutoConfigureMockMvc` com `@Autowired MockMvc` nos testes de integração.**  
+  A abordagem manual de recriar o `MockMvc` via `MockMvcBuilders.webAppContextSetup(context).build()` em cada `@BeforeEach` instancia um novo objeto por teste, ignorando filtros e configurações registrados automaticamente pelo Spring Boot (ex: `SecurityFilterChain`, `CharacterEncodingFilter`). Usar `@AutoConfigureMockMvc` garante que o `MockMvc` seja configurado uma única vez pelo Spring Boot com o contexto completo, seja injetado via `@Autowired` e reutilizado entre os testes — comportamento consistente com o que a aplicação executa em produção.
